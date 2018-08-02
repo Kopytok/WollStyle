@@ -1,0 +1,9 @@
+*.ipynb
+*.csv
+*.log
+*.xlsx
+
+__pycache__/
+.ipynb_checkpoints
+updater/logging/
+parse\ konto/output/
