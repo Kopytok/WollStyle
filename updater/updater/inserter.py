@@ -6,10 +6,9 @@ import pandas as pd
 def touch_folder(path):
     """ Create folder if it does not exist """
     if os.path.exists(path):
-        pass
-    else:
-        os.mkdir(path)
-        logging.info("Created folder %s" % path)
+        return
+    os.mkdir(path)
+    logging.info("Created folder %s" % path)
 
 logging_folder = os.path.join(os.getcwd(), "logging")
 logging_path  = os.path.join(logging_folder, "text_log.log")
@@ -34,7 +33,7 @@ def log_data(data, path, title="checked"):
         p = path.replace(os.getcwd(), "")
         logging.info("Saved %s rows to %s" % (title, p))
     else:
-        pass
+        return
 
 def duplicate_ind(update, products, col):
     """ Check if `col` value in `update` already exists in `product` """
