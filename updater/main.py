@@ -37,7 +37,7 @@ def calculate_fields(data):
        """
     data["TAXCAT"]    = data["product_group"].apply(TAXCAT)
     data["temp"]      = data["TAXCAT"]\
-        .apply(lambda x: 1.19 if x == "000" else 1.07)
+        .apply(lambda x: 1.19 if x == "001" else 1.07)
     data["PRICESELL"] = (data["rrp"] / data["temp"]).round(2)
     data["CATEGORY"]  = data.apply(initial_category, axis=1)
     data["ID"]        = data.apply(generate_hash, axis=1)
@@ -99,10 +99,10 @@ def main():
 
     # Rename ready columns
     rename_columns = {
-        "id":     "REFERENCE",
-        "ean":    "CODE",
-        "p_NAME": "NAME",
-        "price":  "PRICEBUY",
+        "id":         "REFERENCE",
+        "ean":        "CODE",
+        "p_NAME":     "NAME",
+        "pricepunit": "PRICEBUY",
     }
     update.rename(columns=rename_columns, inplace=True)
     logging.info("Number of rows after cleaning: %d" % update.shape[0])

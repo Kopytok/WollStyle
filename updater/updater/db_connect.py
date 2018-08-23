@@ -80,12 +80,12 @@ def insert(data, table_name):
     rows = list()
     for i, row in data.iterrows():
         rows.append(row.to_dict())
-    logging.info("Insertion finished.")
 
     cursor.executemany(insert_query, rows)
     cursor.close()
     cnx.commit()
     cnx.close()
+    logging.info("Insertion finished.")
 
 if __name__ == "__main__":
     pass

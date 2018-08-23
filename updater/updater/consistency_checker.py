@@ -17,7 +17,8 @@ logging.basicConfig(level=logging.INFO,
 
 def read_update(path):
     """ Reads update dataframe from `path` """
-    usecols = ["id", "ean", "product_group", "colorn", "name", "price", "rrp"]
+    usecols = ["id", "ean", "product_group", "colorn", "name",
+               "pricepunit", "rrp"]
     try:
         update = pd.read_csv(path, sep=";", encoding="cp1252", usecols=usecols)
     except FileNotFoundError as e:
