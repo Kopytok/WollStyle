@@ -20,7 +20,7 @@ def generate_hash(x): # TODO `ID`
     from uuid import uuid4
     return str(uuid4())
 
-def initial_category(x): # TODO added by simon
+def initial_category(x):
     """ Fill `CATEGORY` """
     return "000"
 
@@ -38,7 +38,7 @@ def calculate_fields(data):
     data["TAXCAT"]    = data["product_group"].apply(TAXCAT)
     data["temp"]      = data["TAXCAT"]\
         .apply(lambda x: 1.19 if x == "001" else 1.07)
-    data["PRICESELL"] = (data["rrp"] / data["temp"]) #.round(2)
+    data["PRICESELL"] = (data["rrp"] / data["temp"]).round(13)
     data["CATEGORY"]  = data.apply(initial_category, axis=1)
     data["ID"]        = data.apply(generate_hash, axis=1)
     for col in ["ISCOM", "ISSCALE"]:
@@ -112,7 +112,7 @@ def main():
     products = fetch_table("products", columns)
     products["REFERENCE"] = products["REFERENCE"].astype(int)
     products["CODE"]      = products["CODE"].astype(float)
-    products["PRICESELL"] = products["PRICESELL"].round(2)
+    products["PRICESELL"] = products["PRICESELL"].round(13)
 
     # Add neccessary columns
     update = calculate_fields(update)
