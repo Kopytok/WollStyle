@@ -26,7 +26,7 @@ def initial_category(x):
 
 def fill_1b(x): # TODO `ISCOM`, `ISSCALE`
     """ Fill `ISCOM` & `ISSCALE` """
-    return b"\x01"
+    return b"\x00"
 
 def calculate_fields(data):
     """ Calculate necessary fields:

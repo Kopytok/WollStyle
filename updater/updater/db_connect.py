@@ -4,6 +4,8 @@ import yaml
 
 import pandas as pd
 
+encoding = "cp1252"
+
 root = os.getcwd()
 cred_path = os.path.join(root, "credentials.yml")
 with open(cred_path, "r") as f:
@@ -28,7 +30,7 @@ def connect():
     import sqlalchemy
     engine = sqlalchemy.create_engine(
         "mysql+pymysql://%s:%s@%s/openbravo" %
-        (USER, PSSWD, HOST))
+        (USER, PSSWD, HOST), encoding=encoding)
     try:
         return engine.raw_connection()
     except sqlalchemy.exc.OperationalError as e :
