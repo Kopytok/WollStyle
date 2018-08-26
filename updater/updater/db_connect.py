@@ -49,7 +49,6 @@ def fetch_table(table_name, columns=["*", ]):
     """ Select `columns` from table in MySQL """
     cols = ", ".join(columns)
     query = "SELECT %s FROM %s;" % (cols, table_name)
-    logging.info("Query:\n{}".format(query))
     data = read_sql(query)
     logging.info("Number of items in %s: %d" % (table_name, data.shape[0]))
     return data
