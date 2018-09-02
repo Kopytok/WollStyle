@@ -24,7 +24,7 @@ def initial_category(x):
     """ Fill `CATEGORY` """
     return "000"
 
-def fill_1b(x): # TODO `ISCOM`, `ISSCALE`
+def fill_0b(x): # TODO `ISCOM`, `ISSCALE`
     """ Fill `ISCOM` & `ISSCALE` """
     return b"\x00"
 
@@ -42,7 +42,7 @@ def calculate_fields(data):
     data["CATEGORY"]  = data.apply(initial_category, axis=1)
     data["ID"]        = data.apply(generate_hash, axis=1)
     for col in ["ISCOM", "ISSCALE"]:
-        data[col] = data.apply(fill_1b, axis=1)
+        data[col] = data.apply(fill_0b, axis=1)
     return data
 
 def select_file(folder, rows=8):

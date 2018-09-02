@@ -5,13 +5,11 @@ import pandas as pd
 
 from .inserter import touch_folder, log_data
 
-logging_path = os.path.join(os.getcwd(), "logging", "text_log.log")
-
 logging.basicConfig(level=logging.INFO,
     format="%(levelname)s - %(asctime)s - %(msg)s",
     datefmt="%Y-%m-%d %H:%M:%S",
     handlers=[
-        logging.FileHandler(logging_path),
+        logging.FileHandler("logging/text_log.log"),
         logging.StreamHandler(),
     ])
 
@@ -37,7 +35,7 @@ def consistency_check(row):
 
 def name_column(row):
     """ Converts `name` and `colorn` into `p_NAME` """
-    return "%s %04d" % (row["name"], row["colorn"])
+    return "%s %04d" % (row["name"], row["id"] % 10000)
 
 def clean_input(data, save_filtered=None):
     """

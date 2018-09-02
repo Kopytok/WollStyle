@@ -29,7 +29,7 @@ def connect():
     """ Create MySQL engine """
     import sqlalchemy
     engine = sqlalchemy.create_engine(
-        "mysql+pymysql://%s:%s@%s/openbravo?charset=%s" %
+        "mysql+pymysql://%s:%s@%s/openbravopos?charset=%s" %
         (USER, PSSWD, HOST, encoding))
     try:
         return engine.raw_connection()
