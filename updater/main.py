@@ -74,9 +74,10 @@ def main():
     from updater.db_connect import fetch_table, insert
 
     root = os.getcwd()
-    logging_folder = op.join(root, "logging")
 
     filename = select_file(op.join(root, "input"))
+    logging_folder = "%s_log" % op.splitext(filename)[0]
+    logging_folder = op.join(root, "logging", logging_folder)
     update_path = op.join(root, "input", filename)
 
     # Dictionary of all used file_paths
