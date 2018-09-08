@@ -1,11 +1,12 @@
 import os
+import os.path as op
 import logging
 
 import pandas as pd
 
 def touch_folder(path):
     """ Create folder if it does not exist """
-    if os.path.exists(path):
+    if op.exists(path):
         return
     os.mkdir(path)
 
@@ -16,8 +17,8 @@ def log_data(data, path, title="checked"):
     if data.shape[0] > 0:
         data.to_csv(path, index=False, encoding="cp1252", sep=";",
                     quoting=csv.QUOTE_NONNUMERIC)
-        p = path.replace(os.getcwd(), "")
-        logging.info("Saved %s rows to %s" % (title, p))
+        p = op.split(path)[1]
+        logging.info("Saved `%s`" % p)
     else:
         return
 
@@ -58,7 +59,7 @@ def price_ind(col, update, products):
 
     return update
 
-def decide_before_insert(update, products):
+def decide_before_insert(update, products, paths):
     """
     1) Create in `update` indicators for `REFERENCE`,
        `NAME` & `CODE` if the row already exists in `products`
@@ -100,10 +101,16 @@ def decide_before_insert(update, products):
     for decision, ix in decisions.items():
         update.loc[ix, "decision"] = decision
 
+        # Log decisions as tables
+        tmp = update[update["decision"] == decision].drop("decision", axis=1)
+        logging.info("%-6s rows count:         %d" % (decision, tmp.shape[0]))
+        log_data(tmp, paths["%s_rows" % decision], decision)
+
     return update
 
 def prepare_to_insert(data):
     """
+    Format table as `openbravopos.products`
     1) Select only neccessary columns
     2) Replace `NaN` with None
     3) Returns only necessary columns
@@ -121,7 +128,7 @@ def prepare_to_insert(data):
     # Leave only columns that will be inserted
     tmp.drop(extra_columns, axis=1, inplace=True)
 
-    logging.info("Number of rows to be inserted: %d" % tmp.shape[0])
+    logging.info("Total modified rows count: %d" % tmp.shape[0])
     return tmp
 
 if __name__ == "__main__":

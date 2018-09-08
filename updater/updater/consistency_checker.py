@@ -14,7 +14,7 @@ def read_update(path):
     except FileNotFoundError as e:
         logging.critical("No such file in `input` folder!")
         quit()
-    logging.info("Number of input rows: %d" % update.shape[0])
+    logging.info("Input rows count:          %d" % update.shape[0])
     return update
 
 def consistency_check(row):

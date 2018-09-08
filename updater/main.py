@@ -68,8 +68,8 @@ def select_file(folder, rows=8):
                 continue
 
 def main():
-    from updater.inserter import log_data, prepare_to_insert,\
-                                 decide_before_insert, touch_folder
+    from updater.inserter \
+        import prepare_to_insert, decide_before_insert, touch_folder
     from updater.consistency_checker import read_update, clean_input
     from updater.db_connect import fetch_table, insert
 
@@ -89,8 +89,9 @@ def main():
 
     # Dictionary of all used file_paths
     logging_folder = "%s_log" % op.splitext(filename)[0]
-    logging_folder = op.join(root, "logging", logging_folder)
-    touch_folder(logging_folder)
+    logging_folder = op.join("logging", logging_folder)
+    logging.info("Logging folder: {}".format(logging_folder))
+    touch_folder(op.join(os.getcwd(), logging_folder))
     paths = {
         # Input
         "update": update_path,
@@ -116,7 +117,7 @@ def main():
         "pricepunit": "PRICEBUY",
     }
     update.rename(columns=rename_columns, inplace=True)
-    logging.info("Number of rows after cleaning: %d" % update.shape[0])
+    logging.info("Rows after cleaning count: %d" % update.shape[0])
 
     # Fetch `products` from database
     columns = list(rename_columns.values()) + ["PRICESELL", ]
@@ -129,20 +130,13 @@ def main():
     update = calculate_fields(update)
 
     # Decide action for each update item
-    update = decide_before_insert(update, products)
-
-    # Log decisions
-    for decision in ("skip", "insert", "update", ):
-        data = update[update["decision"] == decision].drop("decision", axis=1)
-        logging.info("Number of %6s rows: %d" % (decision, data.shape[0]))
-        log_data(data, paths["%s_rows" % decision], decision)
+    update = decide_before_insert(update, products, paths)
 
     # Leave only insert & update data
     update = update[update["decision"] != "skip"].drop("decision", axis=1)
     # Format columns & insert data
     update = prepare_to_insert(update)
     insert(update, "products")
-    logging.info("----------------------------------------")
 
 if __name__ == "__main__":
     main()

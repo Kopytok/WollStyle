@@ -40,7 +40,7 @@ def fetch_table(table_name, columns=["*", ]):
     cols = ", ".join(columns)
     query = "SELECT %s FROM %s;" % (cols, table_name)
     data = read_sql(query)
-    logging.info("Number of items in %s: %d" % (table_name, data.shape[0]))
+    logging.info("Items in %s count:   %d" % (table_name, data.shape[0]))
     return data
 
 def insert(data, table_name):
@@ -77,7 +77,7 @@ def insert(data, table_name):
     cursor.close()
     cnx.commit()
     cnx.close()
-    logging.info("Insertion finished.")
+    logging.info("----------------------------------------------------------")
 
 if __name__ == "__main__":
     pass
