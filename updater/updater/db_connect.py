@@ -15,16 +15,6 @@ PSSWD = cred["MYSQL_PSSWD"]
 USER  = cred["MYSQL_USER"]
 HOST  = cred["HOST"]
 
-logging_path = os.path.join(os.getcwd(), "logging", "text_log.log")
-
-logging.basicConfig(level=logging.INFO,
-    format="%(levelname)s - %(asctime)s - %(msg)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-    handlers=[
-        logging.FileHandler(logging_path),
-        logging.StreamHandler(),
-    ])
-
 def connect():
     """ Create MySQL engine """
     import sqlalchemy

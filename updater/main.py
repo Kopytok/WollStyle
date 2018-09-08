@@ -75,13 +75,22 @@ def main():
 
     root = os.getcwd()
 
+    touch_folder(op.join(os.getcwd(), "logging"))
+    logging.basicConfig(level=logging.INFO,
+        format="%(levelname)s - %(asctime)s - %(msg)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        handlers=[
+            logging.FileHandler(op.join(root, "logging", "text_log.log")),
+            logging.StreamHandler(),
+        ])
+
     filename = select_file(op.join(root, "input"))
-    logging_folder = "%s_log" % op.splitext(filename)[0]
-    logging_folder = op.join(root, "logging", logging_folder)
-    touch_folder(logging_folder)
     update_path = op.join(root, "input", filename)
 
     # Dictionary of all used file_paths
+    logging_folder = "%s_log" % op.splitext(filename)[0]
+    logging_folder = op.join(root, "logging", logging_folder)
+    touch_folder(logging_folder)
     paths = {
         # Input
         "update": update_path,
@@ -133,7 +142,7 @@ def main():
     # Format columns & insert data
     update = prepare_to_insert(update)
     insert(update, "products")
-    logging.info("----------------------------------------------------------")
+    logging.info("----------------------------------------")
 
 if __name__ == "__main__":
     main()

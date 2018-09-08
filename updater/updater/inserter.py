@@ -8,20 +8,6 @@ def touch_folder(path):
     if os.path.exists(path):
         return
     os.mkdir(path)
-    logging.info("Created folder %s" % path)
-
-logging_folder = os.path.join(os.getcwd(), "logging")
-logging_path  = os.path.join(logging_folder, "text_log.log")
-
-touch_folder(logging_folder)
-
-logging.basicConfig(level=logging.INFO,
-    format="%(levelname)s - %(asctime)s - %(msg)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-    handlers=[
-        logging.FileHandler(logging_path),
-        logging.StreamHandler(),
-    ])
 
 def log_data(data, path, title="checked"):
     """ Save dataframe into `.csv` file if it has rows """

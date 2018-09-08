@@ -5,14 +5,6 @@ import pandas as pd
 
 from .inserter import touch_folder, log_data
 
-logging.basicConfig(level=logging.INFO,
-    format="%(levelname)s - %(asctime)s - %(msg)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-    handlers=[
-        logging.FileHandler("logging/text_log.log"),
-        logging.StreamHandler(),
-    ])
-
 def read_update(path):
     """ Reads update dataframe from `path` """
     usecols = ["id", "ean", "product_group", "colorn", "name",
