@@ -51,10 +51,10 @@ def select_file(folder, rows=8):
     page  = 0
     while True:
         for i, name in zip(range(rows), files[page * rows:(page + 1) * rows]):
-            print(i, name)
+            print("%d)" % i, name)
         try:
             choice = int(input(
-                "Select file. (8 for prev page, 9 for next page)\n"))
+                "Select file. (8 for prev page, 9 for next page): "))
         except ValueError as e:
             continue
         if choice == 9 and len(files):
