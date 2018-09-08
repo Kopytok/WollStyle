@@ -77,7 +77,7 @@ def insert(data, table_name):
     cursor.close()
     cnx.commit()
     cnx.close()
-    logging.info("----------------------------------------------------------")
+    logging.info("-------------------------------------------------")
 
 if __name__ == "__main__":
     pass
