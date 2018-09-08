@@ -69,7 +69,7 @@ def select_file(folder, rows=8):
 
 def main():
     from updater.inserter import log_data, prepare_to_insert,\
-                                 decide_before_insert
+                                 decide_before_insert, touch_folder
     from updater.consistency_checker import read_update, clean_input
     from updater.db_connect import fetch_table, insert
 
@@ -78,6 +78,7 @@ def main():
     filename = select_file(op.join(root, "input"))
     logging_folder = "%s_log" % op.splitext(filename)[0]
     logging_folder = op.join(root, "logging", logging_folder)
+    touch_folder(logging_folder)
     update_path = op.join(root, "input", filename)
 
     # Dictionary of all used file_paths
