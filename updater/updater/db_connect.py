@@ -40,13 +40,12 @@ def fetch_table(table_name, columns=["*", ]):
     cols = ", ".join(columns)
     query = "SELECT %s FROM %s;" % (cols, table_name)
     data = read_sql(query)
-    logging.info("Items in %s count:   %d" % (table_name, data.shape[0]))
+    logging.info("%-30s%d" %
+        ("Items in %s:" % table_name, data.shape[0]))
     return data
 
-def insert(data, table_name):
-    """ Insert data into table """
-    cnx = connect()
-    insert_query = """INSERT INTO {}
+def insert_products(data):
+    query = """INSERT INTO products
         (id
          , reference
          , code
@@ -66,18 +65,29 @@ def insert(data, table_name):
         pricebuy = VALUES(pricebuy)
         , pricesell = VALUES(pricesell)
     ;
-    """.format(table_name)
+    """
+    insert(data, query)
+
+def insert_categories(data):
+    query = """INSERT INTO categories (ID, NAME)
+    VALUES (%(ID)s, %(NAME)s)
+    ;
+    """
+    insert(data, query)
+
+def insert(data, query):
+    """ Insert data into table """
+    cnx = connect()
     cursor = cnx.cursor()
 
     rows = list()
     for i, row in data.iterrows():
         rows.append(row.to_dict())
 
-    cursor.executemany(insert_query, rows)
+    cursor.executemany(query, rows)
     cursor.close()
     cnx.commit()
     cnx.close()
-    logging.info("-------------------------------------------------")
 
 if __name__ == "__main__":
     pass

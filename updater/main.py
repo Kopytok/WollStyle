@@ -1,6 +1,5 @@
 import os
 import os.path as op
-import sys
 import logging
 
 import pandas as pd
@@ -18,11 +17,43 @@ def PRICESELL(data):
 def generate_hash(x): # TODO `ID`
     """ Generate `ID` value """
     from uuid import uuid4
+
     return str(uuid4())
 
-def initial_category(x):
-    """ Fill `CATEGORY` """
-    return "000"
+def set_category(data):
+    """ Finds ID in categories or creates new and updates categories """
+    from updater.db_connect import fetch_table
+
+    data["tmp"] = (data["REFERENCE"] // 10000).astype(str)
+
+    # Fetch existing categories
+    categories = fetch_table("categories", columns=["ID", "NAME"])\
+        .rename(columns={"NAME": "tmp", "ID": "CATEGORY"})
+
+    # Join `categories` to find existing categories
+    data = data.merge(categories, on="tmp", how="left")
+
+    # Create new `categories` table and check if it has new categories
+    categories = data[["CATEGORY", "tmp"]].drop_duplicates()
+    new_categories_ix = categories["CATEGORY"].isnull()
+    if new_categories_ix.sum():
+        from updater.db_connect import insert_categories
+
+        categories.loc[new_categories_ix, "CATEGORY"] = \
+            categories.loc[new_categories_ix].apply(generate_hash, axis=1)
+
+        # Find new categories
+        new_categories = categories.loc[new_categories_ix]
+        logging.info("%-30s%d" %
+            ("new categories:", new_categories.shape[0]))
+
+        # Update ID in data
+        data = data.drop("CATEGORY", axis=1).merge(categories, on="tmp")
+        return data, new_categories.rename(columns={
+                "CATEGORY": "ID",
+                "tmp": "NAME",
+            })
+    return data.drop("tmp", axis=1), None
 
 def fill_0b(x): # TODO `ISCOM`, `ISSCALE`
     """ Fill `ISCOM` & `ISSCALE` """
@@ -39,11 +70,12 @@ def calculate_fields(data):
     data["temp"]      = data["TAXCAT"]\
         .apply(lambda x: 1.19 if x == "001" else 1.07)
     data["PRICESELL"] = (data["rrp"] / data["temp"]).round(13)
-    data["CATEGORY"]  = data.apply(initial_category, axis=1)
     data["ID"]        = data.apply(generate_hash, axis=1)
+
+    data, new_categories = set_category(data)
     for col in ["ISCOM", "ISSCALE"]:
         data[col] = data.apply(fill_0b, axis=1)
-    return data
+    return data, new_categories
 
 def select_file(folder, rows=8):
     """ Select menu for input directory """
@@ -71,7 +103,8 @@ def main():
     from updater.inserter \
         import prepare_to_insert, decide_before_insert, touch_folder
     from updater.consistency_checker import read_update, clean_input
-    from updater.db_connect import fetch_table, insert
+    from updater.db_connect \
+        import fetch_table, insert_products, insert_categories
 
     root = os.getcwd()
 
@@ -90,17 +123,18 @@ def main():
     # Dictionary of all used file_paths
     logging_folder = "%s_log" % op.splitext(filename)[0]
     logging_folder = op.join("logging", logging_folder)
-    logging.info("Logging folder: {}".format(logging_folder))
+    logging.info("%-30s%s" % ("Logging folder:", logging_folder))
     touch_folder(op.join(os.getcwd(), logging_folder))
     paths = {
         # Input
         "update": update_path,
 
         # Logging files
-        "consistency": op.join(logging_folder, "constistency_fail.csv"),
-        "skip_rows":   op.join(logging_folder, "skipped_rows.csv"),
-        "insert_rows": op.join(logging_folder, "inserted_rows.csv"),
-        "update_rows": op.join(logging_folder, "updated_rows.csv"),
+        "consistency":    op.join(logging_folder, "constistency_fail.csv"),
+        "skip_rows":      op.join(logging_folder, "skipped_rows.csv"),
+        "insert_rows":    op.join(logging_folder, "inserted_rows.csv"),
+        "update_rows":    op.join(logging_folder, "updated_rows.csv"),
+        "new_categories": op.join(logging_folder, "new_categories.csv"),
     }
 
     # Read `update.csv`
@@ -117,7 +151,7 @@ def main():
         "pricepunit": "PRICEBUY",
     }
     update.rename(columns=rename_columns, inplace=True)
-    logging.info("Rows after cleaning count: %d" % update.shape[0])
+    logging.info("%-30s%d" % ("Rows after cleaning:", update.shape[0]))
 
     # Fetch `products` from database
     columns = list(rename_columns.values()) + ["PRICESELL", ]
@@ -127,7 +161,7 @@ def main():
     products["PRICESELL"] = products["PRICESELL"].round(13)
 
     # Add neccessary columns
-    update = calculate_fields(update)
+    update, new_categories = calculate_fields(update)
 
     # Decide action for each update item
     update = decide_before_insert(update, products, paths)
@@ -136,7 +170,13 @@ def main():
     update = update[update["decision"] != "skip"].drop("decision", axis=1)
     # Format columns & insert data
     update = prepare_to_insert(update)
-    insert(update, "products")
+    if not isinstance(new_categories, type(None)):
+        from updater.inserter import log_data
+
+        log_data(new_categories, paths["new_categories"])
+        insert_categories(new_categories)
+    insert_products(update)
+    logging.info("-------------------------------------------------")
 
 if __name__ == "__main__":
     main()

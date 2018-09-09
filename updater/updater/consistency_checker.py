@@ -14,7 +14,7 @@ def read_update(path):
     except FileNotFoundError as e:
         logging.critical("No such file in `input` folder!")
         quit()
-    logging.info("Input rows count:          %d" % update.shape[0])
+    logging.info("%-30s%d" % ("Input rows:", update.shape[0]))
     return update
 
 def consistency_check(row):
@@ -55,7 +55,7 @@ def clean_input(data, save_filtered=None):
 
     if save_filtered:
         touch_folder(os.path.dirname(save_filtered))
-        log_data(data[data["fail"]], save_filtered, "consistency fail")
+        log_data(data[data["fail"]], save_filtered)
 
     return data.loc[~data["fail"], columns + ["p_NAME"]]\
         .reset_index(drop=True)

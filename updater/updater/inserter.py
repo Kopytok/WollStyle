@@ -10,15 +10,14 @@ def touch_folder(path):
         return
     os.mkdir(path)
 
-def log_data(data, path, title="checked"):
+def log_data(data, path):
     """ Save dataframe into `.csv` file if it has rows """
     import csv
 
     if data.shape[0] > 0:
         data.to_csv(path, index=False, encoding="cp1252", sep=";",
                     quoting=csv.QUOTE_NONNUMERIC)
-        p = op.split(path)[1]
-        logging.info("Saved `%s`" % p)
+        logging.info("Saved `%s`" % op.split(path)[1])
     else:
         return
 
@@ -103,8 +102,8 @@ def decide_before_insert(update, products, paths):
 
         # Log decisions as tables
         tmp = update[update["decision"] == decision].drop("decision", axis=1)
-        logging.info("%-6s rows count:         %d" % (decision, tmp.shape[0]))
-        log_data(tmp, paths["%s_rows" % decision], decision)
+        logging.info("%-30s%d" % ("%-6s rows:" % decision, tmp.shape[0]))
+        log_data(tmp, paths["%s_rows" % decision])
 
     return update
 
@@ -128,7 +127,7 @@ def prepare_to_insert(data):
     # Leave only columns that will be inserted
     tmp.drop(extra_columns, axis=1, inplace=True)
 
-    logging.info("Total modified rows count: %d" % tmp.shape[0])
+    logging.info("%-30s%d" % ("Total modified rows:", tmp.shape[0]))
     return tmp
 
 if __name__ == "__main__":
